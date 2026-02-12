@@ -12,13 +12,27 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: coach } = await supabase
+  let { data: coach } = await supabase
     .from('coaches')
     .select('*')
     .eq('auth_user_id', user.id)
     .single();
 
-  if (!coach) redirect('/login');
+  // Auto-create coach record if missing (prevents redirect loop)
+  if (!coach) {
+    const { data: newCoach } = await supabase
+      .from('coaches')
+      .insert({
+        auth_user_id: user.id,
+        email: user.email!,
+        name: user.user_metadata?.name || null,
+        onboarding_step: 'signup',
+      })
+      .select()
+      .single();
+    coach = newCoach;
+    if (!coach) redirect('/login');
+  }
 
   const step = coach.onboarding_step;
 
