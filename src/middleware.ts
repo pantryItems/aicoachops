@@ -25,33 +25,8 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
-
-  // Protected routes — redirect to login if not authenticated
-  if (
-    (pathname.startsWith('/dashboard') ||
-      pathname.startsWith('/intake') ||
-      pathname.startsWith('/connect') ||
-      pathname.startsWith('/build') ||
-      pathname.startsWith('/admin')) &&
-    !user
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    url.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(url);
-  }
-
-  // Redirect authenticated users away from auth pages
-  if ((pathname === '/login' || pathname === '/signup') && user) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/dashboard';
-    return NextResponse.redirect(url);
-  }
+  // Refresh the session — this is the main purpose of the middleware
+  await supabase.auth.getUser();
 
   return supabaseResponse;
 }
