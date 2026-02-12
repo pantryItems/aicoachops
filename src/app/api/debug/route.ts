@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -19,8 +20,8 @@ export async function GET(request: NextRequest) {
   const cookieNames = allCookies.map(c => c.name);
   const authCookies = allCookies.filter(c => c.name.includes('supabase') || c.name.includes('sb-'));
 
-  // Try to get user
-  let userResult: Record<string, unknown> = {};
+  // Test 1: Direct from request cookies (like debug endpoint)
+  let directResult: Record<string, unknown> = {};
   try {
     const supabase = createServerClient(url!, key!, {
       cookies: {
@@ -31,19 +32,54 @@ export async function GET(request: NextRequest) {
       },
     });
     const { data, error } = await supabase.auth.getUser();
-    userResult = {
+    directResult = {
       user_id: data?.user?.id || null,
       user_email: data?.user?.email || null,
       error: error?.message || null,
     };
   } catch (e: unknown) {
-    userResult = { exception: String(e) };
+    directResult = { exception: String(e) };
+  }
+
+  // Test 2: Using server.ts createClient (same as dashboard)
+  let serverClientResult: Record<string, unknown> = {};
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.getUser();
+    serverClientResult = {
+      user_id: data?.user?.id || null,
+      user_email: data?.user?.email || null,
+      error: error?.message || null,
+    };
+  } catch (e: unknown) {
+    serverClientResult = { exception: String(e) };
+  }
+
+  // Test 3: Check coach record
+  let coachResult: Record<string, unknown> = {};
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: coach, error } = await supabase
+        .from('coaches')
+        .select('id, email, onboarding_step')
+        .eq('auth_user_id', user.id)
+        .single();
+      coachResult = { coach, error: error?.message || null };
+    } else {
+      coachResult = { coach: null, note: 'no user' };
+    }
+  } catch (e: unknown) {
+    coachResult = { exception: String(e) };
   }
 
   return NextResponse.json({
     env: envCheck,
     cookies: cookieNames,
     auth_cookies: authCookies.map(c => ({ name: c.name, value_length: c.value.length })),
-    user: userResult,
+    direct_auth: directResult,
+    server_client_auth: serverClientResult,
+    coach: coachResult,
   });
 }
