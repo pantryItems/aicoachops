@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, ArrowRight, ClipboardList, Plug, Hammer } from 'lucide-react';
+import { FeedbackSurvey } from '@/components/dashboard/feedback-survey';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -103,6 +104,11 @@ export default async function DashboardPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Feedback Survey */}
+        <div className="mt-6">
+          <FeedbackSurvey coachId={coach.id} buildId={latestBuild.id} />
+        </div>
 
         <div className="mt-6 text-center">
           <Link href="/build">
