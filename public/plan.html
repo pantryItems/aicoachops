@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI CoachOps — Project Roadmap</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-light: #dbeafe;
+      --blue-dark: #1e40af;
+      --green: #16a34a;
+      --green-light: #dcfce7;
+      --yellow: #ca8a04;
+      --yellow-light: #fef9c3;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --red: #dc2626;
+      --red-light: #fee2e2;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+      color: white;
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    .header h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .header p { font-size: 1.1rem; opacity: 0.85; max-width: 600px; margin: 0 auto; }
+    .header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 1.25rem 1.5rem;
+    }
+    .stat { text-align: center; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--blue); }
+    .stat-label { font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Container */
+    .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* Section */
+    .section { margin-bottom: 2.5rem; }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title .icon { font-size: 1.4rem; }
+
+    /* Cards */
+    .card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      transition: box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+    /* Collapsible */
+    .collapsible-header {
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .collapsible-header:hover { background: var(--gray-50); }
+    .collapsible-header h3 { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+    .collapsible-header .arrow {
+      transition: transform 0.2s;
+      color: var(--gray-400);
+      font-size: 1.2rem;
+    }
+    .collapsible-header.open .arrow { transform: rotate(90deg); }
+    .collapsible-body {
+      display: none;
+      padding: 0 1.25rem 1.25rem;
+      border-top: 1px solid var(--gray-100);
+    }
+    .collapsible-body.open { display: block; padding-top: 1rem; }
+
+    /* Phase timeline */
+    .phase { position: relative; padding-left: 2rem; margin-bottom: 0; }
+    .phase::before {
+      content: '';
+      position: absolute;
+      left: 0.55rem;
+      top: 2rem;
+      bottom: 0;
+      width: 2px;
+      background: var(--gray-200);
+    }
+    .phase:last-child::before { display: none; }
+    .phase-dot {
+      position: absolute;
+      left: 0;
+      top: 0.35rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: 50%;
+      border: 2px solid;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+    }
+    .phase-dot.active { border-color: var(--blue); background: var(--blue-light); }
+    .phase-dot.done { border-color: var(--green); background: var(--green-light); }
+    .phase-dot.upcoming { border-color: var(--gray-300); background: var(--gray-100); }
+
+    /* Task list */
+    .task-list { list-style: none; }
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.4rem 0;
+      font-size: 0.9rem;
+    }
+    .task-check {
+      width: 1.1rem;
+      height: 1.1rem;
+      border-radius: 4px;
+      border: 2px solid var(--gray-300);
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .task-check.done { background: var(--green); border-color: var(--green); color: white; }
+    .task-check.in-progress { background: var(--blue-light); border-color: var(--blue); }
+    .task-text.done { text-decoration: line-through; color: var(--gray-400); }
+
+    /* Badge */
+    .badge-sm {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge-green { background: var(--green-light); color: var(--green); }
+    .badge-blue { background: var(--blue-light); color: var(--blue); }
+    .badge-yellow { background: var(--yellow-light); color: var(--yellow); }
+    .badge-gray { background: var(--gray-100); color: var(--gray-500); }
+    .badge-red { background: var(--red-light); color: var(--red); }
+
+    /* Table */
+    .table-wrapper { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    th { text-align: left; padding: 0.75rem; background: var(--gray-50); color: var(--gray-500); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    td { padding: 0.75rem; border-top: 1px solid var(--gray-100); }
+    tr:hover td { background: var(--gray-50); }
+
+    /* Flow diagram */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      padding: 1rem 0;
+    }
+    .flow-step {
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .flow-arrow { color: var(--gray-300); font-size: 1.2rem; }
+
+    /* Cost block */
+    .cost-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+    .cost-item {
+      background: var(--gray-50);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .cost-item .service { font-weight: 600; margin-bottom: 0.25rem; }
+    .cost-item .price { font-size: 1.25rem; font-weight: 700; color: var(--green); }
+    .cost-item .detail { font-size: 0.75rem; color: var(--gray-500); }
+
+    /* GHL capabilities */
+    .cap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .cap-list { list-style: none; }
+    .cap-list li { padding: 0.3rem 0; font-size: 0.875rem; display: flex; align-items: center; gap: 0.4rem; }
+    .cap-list .yes { color: var(--green); }
+    .cap-list .no { color: var(--red); }
+
+    /* Progress bar */
+    .progress-bar {
+      background: var(--gray-200);
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s;
+    }
+
+    /* Risk items */
+    .risk-item {
+      background: var(--gray-50);
+      border-left: 3px solid;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.875rem;
+    }
+    .risk-item.high { border-color: var(--red); }
+    .risk-item.medium { border-color: var(--yellow); }
+    .risk-item.low { border-color: var(--green); }
+    .risk-item strong { display: block; margin-bottom: 0.25rem; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      color: var(--gray-400);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--gray-200);
+    }
+
+    @media (max-width: 640px) {
+      .header h1 { font-size: 1.75rem; }
+      .stats-bar { gap: 1rem; }
+      .cap-grid { grid-template-columns: 1fr; }
+      .flow { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge">BETA MVP — FEB 2026</div>
+    <h1>AI CoachOps</h1>
+    <p>AI-powered operating system that auto-builds coaching CRMs in Go High Level. Eliminate tech overwhelm — coaches answer 5 questions, AI configures everything.</p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-value">$0</div>
+      <div class="stat-label">Monthly Cost</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">~$0.03</div>
+      <div class="stat-label">Per Build (AI)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">3-5</div>
+      <div class="stat-label">Beta Coaches</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">2-4 wk</div>
+      <div class="stat-label">To Launch</div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- VISION -->
+    <div class="section">
+      <div class="section-title"><span class="icon">🎯</span> Product Vision</div>
+      <div class="card">
+        <div class="collapsible-header open" onclick="toggle(this)">
+          <h3>The Problem We Solve</h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body open">
+          <p style="margin-bottom:1rem;">Online coaches buy Go High Level ($97-297/mo) but never set it up. The tech is overwhelming, agencies charge $2,000+, and YouTube tutorials waste hours. <strong>70%+ of GHL accounts are underutilized.</strong></p>
+          <p><strong>Our solution:</strong> Coach answers 5 questions → AI generates a custom CRM config → we build it in their GHL automatically. 5 minutes instead of 5 weeks.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="collapsible-header" onclick="toggle(this)">
+          <h3>3-Phase Vision</h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body">
+          <div class="phase" style="padding-bottom:1.5rem;">
+            <div class="phase-dot active"></div>
+            <div>
+              <strong>Phase 1: CRM Builder</strong> <span class="badge-sm badge-blue">NOW</span>
+              <p style="font-size:0.875rem;color:var(--gray-600);">AI intake → auto-configure GHL with tags, fields, templates, calendars. Validate with beta coaches.</p>
+            </div>
+          </div>
+          <div class="phase" style="padding-bottom:1.5rem;">
+            <div class="phase-dot upcoming"></div>
+            <div>
+              <strong>Phase 2: Coaching Intelligence</strong> <span class="badge-sm badge-gray">LATER</span>
+              <p style="font-size:0.875rem;color:var(--gray-600);">AI-powered session prep, call analysis, client progress tracking, blind spot detection.</p>
+            </div>
+          </div>
+          <div class="phase">
+            <div class="phase-dot upcoming"></div>
+            <div>
+              <strong>Phase 3: Multi-Platform</strong> <span class="badge-sm badge-gray">FUTURE</span>
+              <p style="font-size:0.875rem;color:var(--gray-600);">Expand beyond GHL — Kajabi, Skool, community builders. Become the coaching operating system.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USER FLOW -->
+    <div class="section">
+      <div class="section-title"><span class="icon">🔄</span> Beta User Flow</div>
+      <div class="flow">
+        <div class="flow-step">Sign Up</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">5-Step Intake</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Connect GHL</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">AI Builds CRM</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="background:var(--green-light);color:var(--green);">System Ready ✓</div>
+      </div>
+      <div class="card">
+        <div class="collapsible-header" onclick="toggle(this)">
+          <h3>Intake Wizard Details (5 Steps)</h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body">
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Step</th><th>Questions</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td><strong>1. Coaching Model</strong></td><td>Type (1:1, group, course, hybrid), niche, ideal client</td><td>Determines archetype &amp; pipeline structure</td></tr>
+                <tr><td><strong>2. Business Info</strong></td><td>Business name, years coaching, client count, revenue</td><td>Scales complexity to maturity level</td></tr>
+                <tr><td><strong>3. Client Journey</strong></td><td>Lead sources, booking method, lead-to-client process</td><td>Maps the funnel for automation</td></tr>
+                <tr><td><strong>4. Services &amp; Pricing</strong></td><td>Service list (name/price/duration), packages, payment</td><td>Configures offerings &amp; calendar slots</td></tr>
+                <tr><td><strong>5. Communication</strong></td><td>Channels, follow-up speed, sequences, biggest pain</td><td>Sets up email/SMS templates &amp; workflows</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TECH STACK -->
+    <div class="section">
+      <div class="section-title"><span class="icon">⚙️</span> Tech Stack &amp; Architecture</div>
+      <div class="card">
+        <div class="collapsible-header" onclick="toggle(this)">
+          <h3>Stack Overview</h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body">
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Layer</th><th>Choice</th><th>Why</th></tr></thead>
+              <tbody>
+                <tr><td>Frontend</td><td><strong>Next.js 15 (App Router)</strong></td><td>Full-stack React, server components, fast iteration</td></tr>
+                <tr><td>Styling</td><td><strong>Tailwind + shadcn/ui</strong></td><td>Rapid UI development, polished components</td></tr>
+                <tr><td>Auth</td><td><strong>Supabase Auth</strong></td><td>Email/password, session management, free tier</td></tr>
+                <tr><td>Database</td><td><strong>Supabase Postgres</strong></td><td>RLS, real-time, generous free tier</td></tr>
+                <tr><td>AI</td><td><strong>Claude API (Sonnet)</strong></td><td>Best structured JSON output, ~$0.03/build</td></tr>
+                <tr><td>CRM</td><td><strong>Go High Level API</strong></td><td>Private integration (beta), Marketplace App (prod)</td></tr>
+                <tr><td>Hosting</td><td><strong>Vercel</strong></td><td>Free tier, auto-deploys, edge functions</td></tr>
+                <tr><td>Validation</td><td><strong>Zod</strong></td><td>Type-safe form validation, AI output parsing</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="collapsible-header" onclick="toggle(this)">
+          <h3>GHL API Capabilities</h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body">
+          <div class="cap-grid">
+            <div>
+              <h4 style="color:var(--green);margin-bottom:0.5rem;">✓ CAN Do via API</h4>
+              <ul class="cap-list">
+                <li><span class="yes">✓</span> Create tags (niche-specific)</li>
+                <li><span class="yes">✓</span> Create custom fields</li>
+                <li><span class="yes">✓</span> Create email templates</li>
+                <li><span class="yes">✓</span> Create/configure calendars</li>
+                <li><span class="yes">✓</span> Create contacts</li>
+                <li><span class="yes">✓</span> Trigger existing workflows</li>
+                <li><span class="yes">✓</span> Manage opportunities</li>
+              </ul>
+            </div>
+            <div>
+              <h4 style="color:var(--red);margin-bottom:0.5rem;">✗ CANNOT Do via API</h4>
+              <ul class="cap-list">
+                <li><span class="no">✗</span> Create pipelines</li>
+                <li><span class="no">✗</span> Create pipeline stages</li>
+                <li><span class="no">✗</span> Build workflow definitions</li>
+              </ul>
+              <p style="font-size:0.8rem;color:var(--gray-500);margin-top:0.75rem;"><strong>Solution:</strong> Snapshots handle pipelines &amp; workflows. Co-founder loads manually for beta. Marketplace App auto-installs for production.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="collapsible-header" onclick="toggle(this)">
+          <h3>Database Schema</h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body">
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Table</th><th>Purpose</th><th>Key Fields</th></tr></thead>
+              <tbody>
+                <tr><td><strong>coaches</strong></td><td>User profiles + GHL connection</td><td>auth_user_id, ghl_api_key, onboarding_step</td></tr>
+                <tr><td><strong>intake_responses</strong></td><td>Wizard answers (5 steps)</td><td>coaching_type, niche, services (JSONB), biggest_tech_pain</td></tr>
+                <tr><td><strong>builds</strong></td><td>GHL configuration builds</td><td>config_spec (JSONB), status, tags_created[], error_log</td></tr>
+                <tr><td><strong>snapshots</strong></td><td>Snapshot templates registry</td><td>archetype, includes_pipelines[], customizable_tags</td></tr>
+                <tr><td><strong>feedback</strong></td><td>Beta validation surveys</td><td>would_pay, price_range, overall_rating</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI ENGINE -->
+    <div class="section">
+      <div class="section-title"><span class="icon">🤖</span> AI Config Engine</div>
+      <div class="card">
+        <div class="collapsible-header" onclick="toggle(this)">
+          <h3>How AI Builds the CRM Config</h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body">
+          <ol style="padding-left:1.25rem;font-size:0.9rem;">
+            <li style="margin-bottom:0.5rem;"><strong>Format intake answers</strong> into structured prompt with coaching context</li>
+            <li style="margin-bottom:0.5rem;"><strong>Call Claude Sonnet</strong> — expert CRM architect persona, strict JSON schema output</li>
+            <li style="margin-bottom:0.5rem;"><strong>Parse &amp; validate</strong> JSON config spec against Zod schema (retry once on parse failure)</li>
+            <li style="margin-bottom:0.5rem;"><strong>Store config</strong> in builds table: archetype, tags, custom fields, email templates, calendar config, branding</li>
+            <li style="margin-bottom:0.5rem;"><strong>Execute via GHL API</strong> — create each item with step-by-step tracking and error handling</li>
+          </ol>
+          <div style="margin-top:1rem;background:var(--gray-50);padding:1rem;border-radius:8px;font-size:0.85rem;">
+            <strong>AI Output Includes:</strong> archetype classification, 8-15 niche tags, 5-10 custom fields, 3-5 email templates (personalized to coach voice), calendar configuration, branding guidelines, automation recommendations
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPRINT PLAN -->
+    <div class="section">
+      <div class="section-title"><span class="icon">📋</span> Sprint Plan</div>
+
+      <div class="card">
+        <div class="collapsible-header open" onclick="toggle(this)">
+          <h3>Week 1: Foundation <span class="badge-sm badge-green" style="margin-left:0.5rem;">IN PROGRESS</span></h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body open">
+          <ul class="task-list">
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Next.js project setup + Tailwind + shadcn</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Supabase project + schema + RLS policies</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Deploy to Vercel (ai-coachops.vercel.app)</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Auth flow (signup, login, email verification)</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Landing page (hero, pain points, how it works, CTA)</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Dashboard with onboarding state machine</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Feedback survey component (would you pay?)</span></li>
+            <li class="task-item"><div class="task-check in-progress" onclick="toggleCheck(this)"></div><span class="task-text">End-to-end auth flow testing &amp; bug fixes</span></li>
+          </ul>
+          <div class="progress-bar"><div class="progress-fill" style="width:88%"></div></div>
+          <div style="font-size:0.75rem;color:var(--gray-500);margin-top:0.25rem;">7 of 8 tasks complete</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="collapsible-header" onclick="toggle(this)">
+          <h3>Week 2: Core Product <span class="badge-sm badge-yellow" style="margin-left:0.5rem;">UP NEXT</span></h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body">
+          <ul class="task-list">
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Intake wizard UI (all 5 steps + review)</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Zod validation schemas for all steps</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Intake wizard auto-save to Supabase</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">AI engine (Claude API integration + prompt engineering)</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Test AI output with 5-10 sample coach profiles</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">GHL connection page (paste API key, validate)</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Move GHL key validation to server-side API route</span></li>
+          </ul>
+          <div class="progress-bar"><div class="progress-fill" style="width:57%"></div></div>
+          <div style="font-size:0.75rem;color:var(--gray-500);margin-top:0.25rem;">4 of 7 tasks complete</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="collapsible-header" onclick="toggle(this)">
+          <h3>Week 3: Build Engine + Testing <span class="badge-sm badge-gray" style="margin-left:0.5rem;">PLANNED</span></h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body">
+          <ul class="task-list">
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">GHL customizer (create tags, fields, templates, calendars)</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Build progress UI (step-by-step status tracking)</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">End-to-end test with real GHL sub-account</span></li>
+            <li class="task-item"><div class="task-check done" onclick="toggleCheck(this)">✓</div><span class="task-text done">Admin dashboard (coach list, builds, feedback)</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Error handling &amp; retry logic for GHL rate limits</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Co-founder reviews intake questions for accuracy</span></li>
+          </ul>
+          <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+          <div style="font-size:0.75rem;color:var(--gray-500);margin-top:0.25rem;">3 of 6 tasks complete</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="collapsible-header" onclick="toggle(this)">
+          <h3>Week 4: Beta Launch <span class="badge-sm badge-gray" style="margin-left:0.5rem;">PLANNED</span></h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body">
+          <ul class="task-list">
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Co-founder builds GHL snapshot template</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Load snapshot into beta coaches' GHL accounts</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Beta coaches (3-5) go through full flow</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Iterate on intake questions + AI prompts</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Collect feedback surveys</span></li>
+            <li class="task-item"><div class="task-check" onclick="toggleCheck(this)"></div><span class="task-text">Bug fixes from real usage</span></li>
+          </ul>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <div style="font-size:0.75rem;color:var(--gray-500);margin-top:0.25rem;">0 of 6 tasks complete</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BETA COST -->
+    <div class="section">
+      <div class="section-title"><span class="icon">💰</span> Beta Cost Breakdown</div>
+      <div class="cost-grid">
+        <div class="cost-item">
+          <div class="service">Vercel</div>
+          <div class="price">$0</div>
+          <div class="detail">Hobby tier, auto-deploys</div>
+        </div>
+        <div class="cost-item">
+          <div class="service">Supabase</div>
+          <div class="price">$0</div>
+          <div class="detail">Free tier (500MB, 50K rows)</div>
+        </div>
+        <div class="cost-item">
+          <div class="service">Claude API</div>
+          <div class="price">~$0.03</div>
+          <div class="detail">Per build (Sonnet)</div>
+        </div>
+        <div class="cost-item">
+          <div class="service">Domain</div>
+          <div class="price">$0</div>
+          <div class="detail">Using Vercel subdomain</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RISKS -->
+    <div class="section">
+      <div class="section-title"><span class="icon">⚡</span> Key Risks &amp; Mitigations</div>
+      <div class="risk-item medium">
+        <strong>GHL API rate limits during build</strong>
+        Mitigation: Sequential API calls with delays, retry logic on 429 responses, step-by-step error tracking
+      </div>
+      <div class="risk-item medium">
+        <strong>AI output quality varies by niche</strong>
+        Mitigation: Strict Zod schema validation, retry on parse failure, review with co-founder across 5-10 sample profiles
+      </div>
+      <div class="risk-item low">
+        <strong>GHL pipeline/workflow API not available</strong>
+        Mitigation: Already solved — snapshots handle what API can't. Co-founder loads manually for beta, Marketplace App auto-installs later
+      </div>
+      <div class="risk-item low">
+        <strong>Beta coaches drop off mid-flow</strong>
+        Mitigation: Auto-save wizard progress, clear step-by-step UI, co-founder provides hands-on support during beta
+      </div>
+    </div>
+
+    <!-- POST BETA -->
+    <div class="section">
+      <div class="section-title"><span class="icon">🚀</span> Post-Beta Roadmap</div>
+      <div class="card">
+        <div class="collapsible-header" onclick="toggle(this)">
+          <h3>After Validation — What's Next</h3>
+          <span class="arrow">›</span>
+        </div>
+        <div class="collapsible-body">
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Item</th><th>Priority</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td>Stripe payments ($299 setup + $99/mo)</td><td><span class="badge-sm badge-red">High</span></td><td>Gate behind validated willingness to pay</td></tr>
+                <tr><td>GHL Marketplace App (OAuth)</td><td><span class="badge-sm badge-red">High</span></td><td>Replaces private integration, enables snapshot auto-install</td></tr>
+                <tr><td>Multiple archetype snapshots</td><td><span class="badge-sm badge-yellow">Medium</span></td><td>Start with 1 universal, expand to 3-5 niche-specific</td></tr>
+                <tr><td>Custom domain + branding</td><td><span class="badge-sm badge-yellow">Medium</span></td><td>aicoachops.com or similar</td></tr>
+                <tr><td>Landing page polish</td><td><span class="badge-sm badge-yellow">Medium</span></td><td>Testimonials, FAQ, pricing comparison, social proof</td></tr>
+                <tr><td>Phase 2: Coaching intelligence</td><td><span class="badge-sm badge-blue">Future</span></td><td>Call analysis, session agendas, client progress, blind spots</td></tr>
+                <tr><td>Phase 3: Multi-platform</td><td><span class="badge-sm badge-gray">Later</span></td><td>Kajabi, Skool, community builders</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VALIDATION -->
+    <div class="section">
+      <div class="section-title"><span class="icon">✅</span> Beta Success Criteria</div>
+      <div class="card" style="padding:1.25rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div style="background:var(--green-light);padding:1rem;border-radius:8px;">
+            <strong style="color:var(--green);display:block;margin-bottom:0.5rem;">Green Light (Proceed)</strong>
+            <ul style="font-size:0.85rem;padding-left:1rem;color:var(--gray-700);">
+              <li>3+ coaches complete full flow</li>
+              <li>2+ say "yes" to "would you pay"</li>
+              <li>Average rating ≥ 4/5</li>
+              <li>GHL configs work as expected</li>
+            </ul>
+          </div>
+          <div style="background:var(--red-light);padding:1rem;border-radius:8px;">
+            <strong style="color:var(--red);display:block;margin-bottom:0.5rem;">Red Flag (Pivot/Iterate)</strong>
+            <ul style="font-size:0.85rem;padding-left:1rem;color:var(--gray-700);">
+              <li>Coaches drop off during intake</li>
+              <li>AI configs need heavy manual fixing</li>
+              <li>"No" to paying from most coaches</li>
+              <li>GHL API limitations block key features</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM -->
+    <div class="section">
+      <div class="section-title"><span class="icon">👥</span> Team</div>
+      <div class="card" style="padding:1.25rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+          <div>
+            <strong>Patrick Gray</strong> — Tech Co-Founder
+            <p style="font-size:0.85rem;color:var(--gray-600);">Product development, AI integration, full-stack engineering, sales</p>
+          </div>
+          <div>
+            <strong>Co-Founder</strong> — Coaching Domain Expert
+            <p style="font-size:0.85rem;color:var(--gray-600);">GHL snapshot building, intake question design, beta coach recruitment &amp; support</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    AI CoachOps — Project Roadmap &amp; Plan<br>
+    Last updated: February 12, 2026
+  </div>
+
+  <script>
+    function toggle(header) {
+      header.classList.toggle('open');
+      const body = header.nextElementSibling;
+      body.classList.toggle('open');
+    }
+
+    function toggleCheck(el) {
+      const text = el.nextElementSibling;
+      if (el.classList.contains('done')) {
+        el.classList.remove('done');
+        el.textContent = '';
+        text.classList.remove('done');
+      } else {
+        el.classList.add('done');
+        el.textContent = '✓';
+        text.classList.add('done');
+      }
+    }
+  </script>
+
+</body>
+</html>
