@@ -7,7 +7,6 @@ import { communicationSchema, type CommunicationData, CHANNEL_OPTIONS } from '@/
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Check } from 'lucide-react';
 
 export function StepCommunication() {
@@ -87,19 +86,31 @@ export function StepCommunication() {
           control={control}
           name="follow_up_frequency"
           render={({ field }) => (
-            <RadioGroup value={field.value ?? ''} onValueChange={field.onChange}>
+            <div className="grid gap-2">
               {[
                 { value: 'same_day', label: 'Same day' },
                 { value: 'few_days', label: 'Within a few days' },
                 { value: 'weekly', label: 'Weekly' },
                 { value: 'when_i_remember', label: 'When I remember...' },
               ].map((opt) => (
-                <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-gray-50">
-                  <RadioGroupItem value={opt.value} id={`freq-${opt.value}`} />
-                  <Label htmlFor={`freq-${opt.value}`} className="cursor-pointer flex-1">{opt.label}</Label>
-                </div>
+                <label
+                  key={opt.value}
+                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    field.value === opt.value ? 'border-blue-500 bg-blue-50 text-blue-700' : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="follow_up_frequency"
+                    value={opt.value}
+                    checked={field.value === opt.value}
+                    onChange={() => field.onChange(opt.value)}
+                    className="size-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                  <span className="flex-1">{opt.label}</span>
+                </label>
               ))}
-            </RadioGroup>
+            </div>
           )}
         />
         {errors.follow_up_frequency && (
@@ -113,18 +124,30 @@ export function StepCommunication() {
           control={control}
           name="uses_email_sequences"
           render={({ field }) => (
-            <RadioGroup value={field.value ?? ''} onValueChange={field.onChange}>
+            <div className="grid gap-2">
               {[
                 { value: 'yes', label: 'Yes' },
                 { value: 'no', label: 'No' },
                 { value: 'whats_that', label: "What's that?" },
               ].map((opt) => (
-                <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-gray-50">
-                  <RadioGroupItem value={opt.value} id={`seq-${opt.value}`} />
-                  <Label htmlFor={`seq-${opt.value}`} className="cursor-pointer flex-1">{opt.label}</Label>
-                </div>
+                <label
+                  key={opt.value}
+                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    field.value === opt.value ? 'border-blue-500 bg-blue-50 text-blue-700' : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="uses_email_sequences"
+                    value={opt.value}
+                    checked={field.value === opt.value}
+                    onChange={() => field.onChange(opt.value)}
+                    className="size-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                  <span className="flex-1">{opt.label}</span>
+                </label>
               ))}
-            </RadioGroup>
+            </div>
           )}
         />
         {errors.uses_email_sequences && (
