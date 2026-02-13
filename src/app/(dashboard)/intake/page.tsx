@@ -1,5 +1,6 @@
 'use client';
 
+import { Component, type ReactNode } from 'react';
 import { WizardProvider, useWizard } from '@/components/intake/wizard-provider';
 import { StepCoachingModel } from '@/components/intake/step-coaching-model';
 import { StepBusinessInfo } from '@/components/intake/step-business-info';
@@ -17,6 +18,45 @@ const STEP_LABELS = [
   'Communication',
   'Review',
 ];
+
+class IntakeErrorBoundary extends Component<
+  { children: ReactNode },
+  { error: Error | null }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="max-w-lg bg-white rounded-xl shadow-sm border p-6 space-y-4">
+            <h2 className="text-xl font-bold text-red-600">Something went wrong</h2>
+            <p className="text-sm text-gray-600">
+              Error: {this.state.error.message}
+            </p>
+            <pre className="text-xs bg-gray-100 p-3 rounded overflow-auto max-h-60">
+              {this.state.error.stack}
+            </pre>
+            <button
+              onClick={() => this.setState({ error: null })}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function WizardContent() {
   const { step, totalSteps } = useWizard();
@@ -57,8 +97,10 @@ function WizardContent() {
 
 export default function IntakePage() {
   return (
-    <WizardProvider>
-      <WizardContent />
-    </WizardProvider>
+    <IntakeErrorBoundary>
+      <WizardProvider>
+        <WizardContent />
+      </WizardProvider>
+    </IntakeErrorBoundary>
   );
 }
