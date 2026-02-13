@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useWizard } from './wizard-provider';
 import { servicesPricingSchema, type ServicesPricingData } from '@/types/intake';
@@ -17,8 +17,6 @@ export function StepServicesPricing() {
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     control,
     formState: { errors },
   } = useForm<ServicesPricingData>({
@@ -104,33 +102,42 @@ export function StepServicesPricing() {
         )}
       </div>
 
-      <div className="flex items-center gap-2">
-        <Checkbox
-          id="uses_packages"
-          checked={watch('uses_packages')}
-          onCheckedChange={(v) => setValue('uses_packages', Boolean(v))}
-        />
-        <Label htmlFor="uses_packages">I offer packages or bundles</Label>
-      </div>
+      <Controller
+        control={control}
+        name="uses_packages"
+        render={({ field }) => (
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="uses_packages"
+              checked={field.value ?? false}
+              onCheckedChange={(v) => field.onChange(Boolean(v))}
+            />
+            <Label htmlFor="uses_packages">I offer packages or bundles</Label>
+          </div>
+        )}
+      />
 
       <div className="space-y-3">
         <Label>How do clients typically pay?</Label>
-        <RadioGroup
-          value={watch('payment_structure') ?? ''}
-          onValueChange={(v) => setValue('payment_structure', v as ServicesPricingData['payment_structure'])}
-        >
-          {[
-            { value: 'per_session', label: 'Per session' },
-            { value: 'monthly', label: 'Monthly retainer' },
-            { value: 'package', label: 'Upfront package' },
-            { value: 'mix', label: 'Mix of the above' },
-          ].map((opt) => (
-            <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-gray-50">
-              <RadioGroupItem value={opt.value} id={`pay-${opt.value}`} />
-              <Label htmlFor={`pay-${opt.value}`} className="cursor-pointer flex-1">{opt.label}</Label>
-            </div>
-          ))}
-        </RadioGroup>
+        <Controller
+          control={control}
+          name="payment_structure"
+          render={({ field }) => (
+            <RadioGroup value={field.value ?? ''} onValueChange={field.onChange}>
+              {[
+                { value: 'per_session', label: 'Per session' },
+                { value: 'monthly', label: 'Monthly retainer' },
+                { value: 'package', label: 'Upfront package' },
+                { value: 'mix', label: 'Mix of the above' },
+              ].map((opt) => (
+                <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-gray-50">
+                  <RadioGroupItem value={opt.value} id={`pay-${opt.value}`} />
+                  <Label htmlFor={`pay-${opt.value}`} className="cursor-pointer flex-1">{opt.label}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          )}
+        />
         {errors.payment_structure && (
           <p className="text-sm text-red-500">{errors.payment_structure.message}</p>
         )}

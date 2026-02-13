@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useWizard } from './wizard-provider';
 import { clientJourneySchema, type ClientJourneyData, LEAD_SOURCE_OPTIONS } from '@/types/intake';
@@ -15,28 +15,17 @@ export function StepClientJourney() {
 
   const {
     handleSubmit,
-    watch,
-    setValue,
     register,
+    control,
     formState: { errors },
   } = useForm<ClientJourneyData>({
     resolver: zodResolver(clientJourneySchema),
     defaultValues: {
       how_clients_find_you: data.how_clients_find_you || [],
-      current_booking_method: data.current_booking_method || '' as string,
+      current_booking_method: data.current_booking_method || '',
       lead_to_client_steps: data.lead_to_client_steps || '',
     },
   });
-
-  const selectedSources = watch('how_clients_find_you');
-
-  function toggleSource(value: string) {
-    const current = selectedSources || [];
-    const updated = current.includes(value)
-      ? current.filter((v) => v !== value)
-      : [...current, value];
-    setValue('how_clients_find_you', updated);
-  }
 
   function onSubmit(values: ClientJourneyData) {
     updateData(values);
@@ -52,23 +41,38 @@ export function StepClientJourney() {
 
       <div className="space-y-3">
         <Label>How do clients find you? (select all that apply)</Label>
-        <div className="grid grid-cols-2 gap-2">
-          {LEAD_SOURCE_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => toggleSource(opt.value)}
-              className={`flex items-center gap-2 p-3 rounded-lg border text-sm text-left transition-colors ${
-                selectedSources?.includes(opt.value)
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'hover:bg-gray-50'
-              }`}
-            >
-              <Checkbox checked={selectedSources?.includes(opt.value) ?? false} className="pointer-events-none" />
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        <Controller
+          control={control}
+          name="how_clients_find_you"
+          render={({ field }) => (
+            <div className="grid grid-cols-2 gap-2">
+              {LEAD_SOURCE_OPTIONS.map((opt) => {
+                const isSelected = (field.value || []).includes(opt.value);
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      const current = field.value || [];
+                      const updated = isSelected
+                        ? current.filter((v) => v !== opt.value)
+                        : [...current, opt.value];
+                      field.onChange(updated);
+                    }}
+                    className={`flex items-center gap-2 p-3 rounded-lg border text-sm text-left transition-colors ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <Checkbox checked={isSelected} className="pointer-events-none" />
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        />
         {errors.how_clients_find_you && (
           <p className="text-sm text-red-500">{errors.how_clients_find_you.message}</p>
         )}
@@ -76,22 +80,25 @@ export function StepClientJourney() {
 
       <div className="space-y-3">
         <Label>How do clients currently book with you?</Label>
-        <RadioGroup
-          value={watch('current_booking_method') ?? ''}
-          onValueChange={(v) => setValue('current_booking_method', v)}
-        >
-          {[
-            { value: 'manual', label: 'They message me and we figure it out' },
-            { value: 'calendly', label: 'Calendly or other scheduling tool' },
-            { value: 'ghl_existing', label: 'Already using GHL calendar' },
-            { value: 'other', label: 'Other' },
-          ].map((opt) => (
-            <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-gray-50">
-              <RadioGroupItem value={opt.value} id={`book-${opt.value}`} />
-              <Label htmlFor={`book-${opt.value}`} className="cursor-pointer flex-1">{opt.label}</Label>
-            </div>
-          ))}
-        </RadioGroup>
+        <Controller
+          control={control}
+          name="current_booking_method"
+          render={({ field }) => (
+            <RadioGroup value={field.value ?? ''} onValueChange={field.onChange}>
+              {[
+                { value: 'manual', label: 'They message me and we figure it out' },
+                { value: 'calendly', label: 'Calendly or other scheduling tool' },
+                { value: 'ghl_existing', label: 'Already using GHL calendar' },
+                { value: 'other', label: 'Other' },
+              ].map((opt) => (
+                <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-gray-50">
+                  <RadioGroupItem value={opt.value} id={`book-${opt.value}`} />
+                  <Label htmlFor={`book-${opt.value}`} className="cursor-pointer flex-1">{opt.label}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          )}
+        />
         {errors.current_booking_method && (
           <p className="text-sm text-red-500">{errors.current_booking_method.message}</p>
         )}

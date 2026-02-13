@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useWizard } from './wizard-provider';
 import { communicationSchema, type CommunicationData, CHANNEL_OPTIONS } from '@/types/intake';
@@ -15,9 +15,8 @@ export function StepCommunication() {
 
   const {
     handleSubmit,
-    watch,
-    setValue,
     register,
+    control,
     formState: { errors },
   } = useForm<CommunicationData>({
     resolver: zodResolver(communicationSchema),
@@ -28,16 +27,6 @@ export function StepCommunication() {
       biggest_tech_pain: data.biggest_tech_pain || '',
     },
   });
-
-  const selectedChannels = watch('preferred_channels');
-
-  function toggleChannel(value: string) {
-    const current = selectedChannels || [];
-    const updated = current.includes(value)
-      ? current.filter((v) => v !== value)
-      : [...current, value];
-    setValue('preferred_channels', updated);
-  }
 
   function onSubmit(values: CommunicationData) {
     updateData(values);
@@ -53,23 +42,38 @@ export function StepCommunication() {
 
       <div className="space-y-3">
         <Label>How do you prefer to communicate? (select all that apply)</Label>
-        <div className="grid grid-cols-2 gap-2">
-          {CHANNEL_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => toggleChannel(opt.value)}
-              className={`flex items-center gap-2 p-3 rounded-lg border text-sm text-left transition-colors ${
-                selectedChannels?.includes(opt.value)
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'hover:bg-gray-50'
-              }`}
-            >
-              <Checkbox checked={selectedChannels?.includes(opt.value) ?? false} className="pointer-events-none" />
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        <Controller
+          control={control}
+          name="preferred_channels"
+          render={({ field }) => (
+            <div className="grid grid-cols-2 gap-2">
+              {CHANNEL_OPTIONS.map((opt) => {
+                const isSelected = (field.value || []).includes(opt.value);
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      const current = field.value || [];
+                      const updated = isSelected
+                        ? current.filter((v) => v !== opt.value)
+                        : [...current, opt.value];
+                      field.onChange(updated);
+                    }}
+                    className={`flex items-center gap-2 p-3 rounded-lg border text-sm text-left transition-colors ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <Checkbox checked={isSelected} className="pointer-events-none" />
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        />
         {errors.preferred_channels && (
           <p className="text-sm text-red-500">{errors.preferred_channels.message}</p>
         )}
@@ -77,22 +81,25 @@ export function StepCommunication() {
 
       <div className="space-y-3">
         <Label>How quickly do you follow up with new leads?</Label>
-        <RadioGroup
-          value={watch('follow_up_frequency') ?? ''}
-          onValueChange={(v) => setValue('follow_up_frequency', v as CommunicationData['follow_up_frequency'])}
-        >
-          {[
-            { value: 'same_day', label: 'Same day' },
-            { value: 'few_days', label: 'Within a few days' },
-            { value: 'weekly', label: 'Weekly' },
-            { value: 'when_i_remember', label: 'When I remember...' },
-          ].map((opt) => (
-            <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-gray-50">
-              <RadioGroupItem value={opt.value} id={`freq-${opt.value}`} />
-              <Label htmlFor={`freq-${opt.value}`} className="cursor-pointer flex-1">{opt.label}</Label>
-            </div>
-          ))}
-        </RadioGroup>
+        <Controller
+          control={control}
+          name="follow_up_frequency"
+          render={({ field }) => (
+            <RadioGroup value={field.value ?? ''} onValueChange={field.onChange}>
+              {[
+                { value: 'same_day', label: 'Same day' },
+                { value: 'few_days', label: 'Within a few days' },
+                { value: 'weekly', label: 'Weekly' },
+                { value: 'when_i_remember', label: 'When I remember...' },
+              ].map((opt) => (
+                <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-gray-50">
+                  <RadioGroupItem value={opt.value} id={`freq-${opt.value}`} />
+                  <Label htmlFor={`freq-${opt.value}`} className="cursor-pointer flex-1">{opt.label}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          )}
+        />
         {errors.follow_up_frequency && (
           <p className="text-sm text-red-500">{errors.follow_up_frequency.message}</p>
         )}
@@ -100,21 +107,24 @@ export function StepCommunication() {
 
       <div className="space-y-3">
         <Label>Do you currently use email sequences or drip campaigns?</Label>
-        <RadioGroup
-          value={watch('uses_email_sequences') ?? ''}
-          onValueChange={(v) => setValue('uses_email_sequences', v as CommunicationData['uses_email_sequences'])}
-        >
-          {[
-            { value: 'yes', label: 'Yes' },
-            { value: 'no', label: 'No' },
-            { value: 'whats_that', label: "What's that?" },
-          ].map((opt) => (
-            <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-gray-50">
-              <RadioGroupItem value={opt.value} id={`seq-${opt.value}`} />
-              <Label htmlFor={`seq-${opt.value}`} className="cursor-pointer flex-1">{opt.label}</Label>
-            </div>
-          ))}
-        </RadioGroup>
+        <Controller
+          control={control}
+          name="uses_email_sequences"
+          render={({ field }) => (
+            <RadioGroup value={field.value ?? ''} onValueChange={field.onChange}>
+              {[
+                { value: 'yes', label: 'Yes' },
+                { value: 'no', label: 'No' },
+                { value: 'whats_that', label: "What's that?" },
+              ].map((opt) => (
+                <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-gray-50">
+                  <RadioGroupItem value={opt.value} id={`seq-${opt.value}`} />
+                  <Label htmlFor={`seq-${opt.value}`} className="cursor-pointer flex-1">{opt.label}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          )}
+        />
         {errors.uses_email_sequences && (
           <p className="text-sm text-red-500">{errors.uses_email_sequences.message}</p>
         )}
