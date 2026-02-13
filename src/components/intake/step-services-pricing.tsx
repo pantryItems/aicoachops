@@ -26,7 +26,7 @@ export function StepServicesPricing() {
     defaultValues: {
       services: data.services?.length ? data.services : [{ name: '', price: '', duration: '', type: '1on1' as const }],
       uses_packages: data.uses_packages ?? false,
-      payment_structure: data.payment_structure || undefined,
+      payment_structure: data.payment_structure || ('' as ServicesPricingData['payment_structure']),
     },
   });
 
@@ -116,7 +116,7 @@ export function StepServicesPricing() {
       <div className="space-y-3">
         <Label>How do clients typically pay?</Label>
         <RadioGroup
-          value={watch('payment_structure')}
+          value={watch('payment_structure') ?? ''}
           onValueChange={(v) => setValue('payment_structure', v as ServicesPricingData['payment_structure'])}
         >
           {[

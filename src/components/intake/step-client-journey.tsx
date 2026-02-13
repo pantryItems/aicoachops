@@ -23,7 +23,7 @@ export function StepClientJourney() {
     resolver: zodResolver(clientJourneySchema),
     defaultValues: {
       how_clients_find_you: data.how_clients_find_you || [],
-      current_booking_method: data.current_booking_method || '',
+      current_booking_method: data.current_booking_method || '' as string,
       lead_to_client_steps: data.lead_to_client_steps || '',
     },
   });
@@ -64,7 +64,7 @@ export function StepClientJourney() {
                   : 'hover:bg-gray-50'
               }`}
             >
-              <Checkbox checked={selectedSources?.includes(opt.value)} className="pointer-events-none" />
+              <Checkbox checked={selectedSources?.includes(opt.value) ?? false} className="pointer-events-none" />
               {opt.label}
             </button>
           ))}
@@ -77,7 +77,7 @@ export function StepClientJourney() {
       <div className="space-y-3">
         <Label>How do clients currently book with you?</Label>
         <RadioGroup
-          value={watch('current_booking_method')}
+          value={watch('current_booking_method') ?? ''}
           onValueChange={(v) => setValue('current_booking_method', v)}
         >
           {[

@@ -23,8 +23,8 @@ export function StepCommunication() {
     resolver: zodResolver(communicationSchema),
     defaultValues: {
       preferred_channels: data.preferred_channels || [],
-      follow_up_frequency: data.follow_up_frequency || undefined,
-      uses_email_sequences: data.uses_email_sequences || undefined,
+      follow_up_frequency: data.follow_up_frequency || ('' as CommunicationData['follow_up_frequency']),
+      uses_email_sequences: data.uses_email_sequences || ('' as CommunicationData['uses_email_sequences']),
       biggest_tech_pain: data.biggest_tech_pain || '',
     },
   });
@@ -65,7 +65,7 @@ export function StepCommunication() {
                   : 'hover:bg-gray-50'
               }`}
             >
-              <Checkbox checked={selectedChannels?.includes(opt.value)} className="pointer-events-none" />
+              <Checkbox checked={selectedChannels?.includes(opt.value) ?? false} className="pointer-events-none" />
               {opt.label}
             </button>
           ))}
@@ -78,7 +78,7 @@ export function StepCommunication() {
       <div className="space-y-3">
         <Label>How quickly do you follow up with new leads?</Label>
         <RadioGroup
-          value={watch('follow_up_frequency')}
+          value={watch('follow_up_frequency') ?? ''}
           onValueChange={(v) => setValue('follow_up_frequency', v as CommunicationData['follow_up_frequency'])}
         >
           {[
@@ -101,7 +101,7 @@ export function StepCommunication() {
       <div className="space-y-3">
         <Label>Do you currently use email sequences or drip campaigns?</Label>
         <RadioGroup
-          value={watch('uses_email_sequences')}
+          value={watch('uses_email_sequences') ?? ''}
           onValueChange={(v) => setValue('uses_email_sequences', v as CommunicationData['uses_email_sequences'])}
         >
           {[

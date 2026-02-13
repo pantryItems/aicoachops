@@ -21,7 +21,7 @@ export function StepCoachingModel() {
   } = useForm<CoachingModelData>({
     resolver: zodResolver(coachingModelSchema),
     defaultValues: {
-      coaching_type: data.coaching_type || undefined,
+      coaching_type: data.coaching_type || ('' as CoachingModelData['coaching_type']),
       niche: data.niche || '',
       niche_detail: data.niche_detail || '',
     },
@@ -44,7 +44,7 @@ export function StepCoachingModel() {
       <div className="space-y-3">
         <Label>What type of coaching do you offer?</Label>
         <RadioGroup
-          value={watch('coaching_type')}
+          value={watch('coaching_type') ?? ''}
           onValueChange={(v) => setValue('coaching_type', v as CoachingModelData['coaching_type'])}
         >
           {[

@@ -22,9 +22,9 @@ export function StepBusinessInfo() {
     resolver: zodResolver(businessInfoSchema),
     defaultValues: {
       business_name: data.business_name || '',
-      years_in_business: data.years_in_business || undefined,
-      current_client_count: data.current_client_count || undefined,
-      monthly_revenue_range: data.monthly_revenue_range || undefined,
+      years_in_business: data.years_in_business || ('' as BusinessInfoData['years_in_business']),
+      current_client_count: data.current_client_count || ('' as BusinessInfoData['current_client_count']),
+      monthly_revenue_range: data.monthly_revenue_range || ('' as BusinessInfoData['monthly_revenue_range']),
     },
   });
 
@@ -55,7 +55,7 @@ export function StepBusinessInfo() {
       <div className="space-y-3">
         <Label>How long have you been coaching?</Label>
         <RadioGroup
-          value={watch('years_in_business')}
+          value={watch('years_in_business') ?? ''}
           onValueChange={(v) => setValue('years_in_business', v as BusinessInfoData['years_in_business'])}
         >
           {[
@@ -79,7 +79,7 @@ export function StepBusinessInfo() {
       <div className="space-y-3">
         <Label>How many active clients do you have?</Label>
         <RadioGroup
-          value={watch('current_client_count')}
+          value={watch('current_client_count') ?? ''}
           onValueChange={(v) => setValue('current_client_count', v as BusinessInfoData['current_client_count'])}
         >
           {[
@@ -103,7 +103,7 @@ export function StepBusinessInfo() {
       <div className="space-y-3">
         <Label>Monthly revenue range?</Label>
         <RadioGroup
-          value={watch('monthly_revenue_range')}
+          value={watch('monthly_revenue_range') ?? ''}
           onValueChange={(v) => setValue('monthly_revenue_range', v as BusinessInfoData['monthly_revenue_range'])}
         >
           {[
