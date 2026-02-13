@@ -7,8 +7,8 @@ import { communicationSchema, type CommunicationData, CHANNEL_OPTIONS } from '@/
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Check } from 'lucide-react';
 
 export function StepCommunication() {
   const { data, updateData, setStep } = useWizard();
@@ -66,7 +66,9 @@ export function StepCommunication() {
                         : 'hover:bg-gray-50'
                     }`}
                   >
-                    <Checkbox checked={isSelected} className="pointer-events-none" />
+                    <span className={`flex items-center justify-center size-4 rounded border ${isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300'}`}>
+                      {isSelected && <Check className="size-3" />}
+                    </span>
                     {opt.label}
                   </button>
                 );

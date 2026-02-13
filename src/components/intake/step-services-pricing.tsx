@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Trash2 } from 'lucide-react';
 
 export function StepServicesPricing() {
@@ -106,14 +105,15 @@ export function StepServicesPricing() {
         control={control}
         name="uses_packages"
         render={({ field }) => (
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="uses_packages"
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
               checked={field.value ?? false}
-              onCheckedChange={(v) => field.onChange(Boolean(v))}
+              onChange={(e) => field.onChange(e.target.checked)}
+              className="size-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <Label htmlFor="uses_packages">I offer packages or bundles</Label>
-          </div>
+            <span className="text-sm font-medium">I offer packages or bundles</span>
+          </label>
         )}
       />
 
